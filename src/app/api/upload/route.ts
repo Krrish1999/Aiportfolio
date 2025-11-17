@@ -63,12 +63,8 @@ export async function POST(request: NextRequest) {
     const sessionId = crypto.randomUUID();
     const actualUserId = userId || crypto.randomUUID();
 
-    // For now, store file info in memory (TODO: implement R2 storage)
-    // Convert file to base64 for temporary storage
-    const fileBuffer = await file.arrayBuffer();
-    const base64File = Buffer.from(fileBuffer).toString('base64');
-    
-    // Simulate file storage
+    // For now, just acknowledge the upload (TODO: implement R2 storage)
+    // In production, this would upload to R2 and queue for processing
     const key = `uploads/${actualUserId}/${sessionId}/${file.name}`;
     const url = `/api/files/${sessionId}`;
 
