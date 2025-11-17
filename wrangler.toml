@@ -1,0 +1,137 @@
+# Cloudflare Workers/Pages Configuration
+# Documentation: https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "ai-resume-portfolio"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Pages configuration for Next.js deployment
+pages_build_output_dir = ".next"
+
+# Account ID (replace with your actual account ID)
+# Get from: Cloudflare Dashboard → Workers & Pages → Overview
+account_id = "your-cloudflare-account-id"
+
+# ======================
+# Pages Configuration
+# ======================
+# Cloudflare Pages specific settings
+[pages]
+# Build configuration
+build_command = "npm run build:pages"
+build_output_dir = ".next"
+
+# Environment variables for Pages build
+[pages.env_vars]
+NODE_VERSION = "20"
+NPM_VERSION = "10"
+
+# ======================
+# R2 Bucket Bindings
+# ======================
+# S3-compatible object storage for file uploads
+# Create bucket: wrangler r2 bucket create ai-resume-storage
+[[r2_buckets]]
+binding = "RESUME_BUCKET"
+bucket_name = "ai-resume-storage"
+preview_bucket_name = "ai-resume-storage-preview"
+
+# ======================
+# KV Namespace Bindings
+# ======================
+# Key-value storage for caching and session data
+# Create namespace: wrangler kv:namespace create RESUME_CACHE
+# Create preview: wrangler kv:namespace create RESUME_CACHE --preview
+[[kv_namespaces]]
+binding = "RESUME_CACHE"
+id = "your-kv-namespace-id"
+preview_id = "your-preview-kv-namespace-id"
+
+# ======================
+# D1 Database Bindings
+# ======================
+# Serverless SQL database (SQLite-based)
+# Create database: wrangler d1 create ai-resume-db
+[[d1_databases]]
+binding = "DB"
+database_name = "ai-resume-db"
+database_id = "your-d1-database-id"
+
+# ======================
+# Durable Objects
+# ======================
+# Stateful serverless compute for job queue processing
+[[durable_objects.bindings]]
+name = "JOB_QUEUE"
+class_name = "JobQueueDO"
+script_name = "ai-resume-portfolio"
+
+# Durable Objects migrations
+[[migrations]]
+tag = "v1"
+new_classes = ["JobQueueDO"]
+
+# ======================
+# Environment Variables
+# ======================
+# Non-sensitive configuration values
+[vars]
+NODE_ENV = "production"
+R2_PUBLIC_URL = "https://pub-your-account-id.r2.dev"
+OPENROUTER_MODEL = "deepseek/deepseek-r1:free"
+WORKERS_AI_MODEL = "@cf/meta/llama-3-8b-instruct"
+
+# ======================
+# Secrets
+# ======================
+# Sensitive values - set using: wrangler secret put SECRET_NAME
+# Required secrets:
+# - OPENROUTER_API_KEY
+# - GITHUB_CLIENT_SECRET
+# - LINKEDIN_CLIENT_SECRET
+# - NEXTAUTH_SECRET
+# - CLOUDFLARE_API_TOKEN (for Pages deployment)
+
+# ======================
+# Build Configuration
+# ======================
+[build]
+command = "npm run build"
+
+[build.upload]
+format = "service-worker"
+
+# ======================
+# Development Configuration
+# ======================
+[dev]
+ip = "0.0.0.0"
+port = 8787
+local_protocol = "http"
+
+# ======================
+# Observability
+# ======================
+[observability]
+enabled = true
+
+# ======================
+# Limits
+# ======================
+# Workers limits (adjust based on your plan)
+# Free tier: 100,000 requests/day, 10ms CPU time
+# Paid tier: Unlimited requests, 30s CPU time
+[limits]
+cpu_ms = 50  # Free tier limit
+
+# ======================
+# Environment-Specific Overrides
+# ======================
+[env.staging]
+name = "ai-resume-portfolio-staging"
+vars = { NODE_ENV = "staging" }
+
+[env.production]
+name = "ai-resume-portfolio"
+vars = { NODE_ENV = "production" }

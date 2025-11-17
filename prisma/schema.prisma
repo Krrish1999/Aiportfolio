@@ -1,0 +1,77 @@
+// Prisma schema for AI Resume Portfolio
+// Configured for SQLite/D1 compatibility
+// 
+// Type conversions from PostgreSQL:
+// - UUID -> String (use crypto.randomUUID() in code)
+// - JSONB -> String (use JSON.stringify/parse in code)
+// - Boolean -> Int (0/1, convert in code)
+// - DateTime -> String (ISO 8601 format)
+// - Decimal -> Float
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String @id // UUID stored as String, generated with crypto.randomUUID()
+  email     String @unique
+  createdAt String @map("created_at") // ISO 8601 timestamp string
+  updatedAt String @map("updated_at") // ISO 8601 timestamp string
+
+  resumeSessions ResumeSession[]
+  portfolios     Portfolio[]
+
+  @@map("users")
+}
+
+model ResumeSession {
+  id               String  @id // UUID stored as String, generated with crypto.randomUUID()
+  userId           String  @map("user_id")
+  originalFilename String  @map("original_filename")
+  fileFormat       String  @map("file_format")
+  processingStatus String  @map("processing_status")
+  parsedData       String? @map("parsed_data") // JSON stored as String, use JSON.stringify/parse
+  createdAt        String  @map("created_at") // ISO 8601 timestamp string
+  updatedAt        String  @map("updated_at") // ISO 8601 timestamp string
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolios     Portfolio[]
+  parsingMetrics ParsingMetric[]
+
+  @@map("resume_sessions")
+}
+
+model Portfolio {
+  id             String  @id // UUID stored as String, generated with crypto.randomUUID()
+  userId         String  @map("user_id")
+  sessionId      String  @map("session_id")
+  templateId     String  @map("template_id")
+  customizations String? // JSON stored as String, use JSON.stringify/parse
+  deploymentUrl  String? @map("deployment_url")
+  isPublished    Int     @default(0) @map("is_published") // Boolean stored as Int (0/1)
+  createdAt      String  @map("created_at") // ISO 8601 timestamp string
+  updatedAt      String  @map("updated_at") // ISO 8601 timestamp string
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session ResumeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("portfolios")
+}
+
+model ParsingMetric {
+  id              String @id // UUID stored as String, generated with crypto.randomUUID()
+  sessionId       String @map("session_id")
+  fieldName       String @map("field_name")
+  confidenceScore Float  @map("confidence_score") // Decimal stored as Float
+  wasEdited       Int    @default(0) @map("was_edited") // Boolean stored as Int (0/1)
+  createdAt       String @map("created_at") // ISO 8601 timestamp string
+
+  session ResumeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("parsing_metrics")
+}
