@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { AnalyticsService } from '@/services/analytics';
 import { CloudflareWorkersEnv } from '@/config/cloudflare-env';
 
+export const runtime = 'edge';
+
 /**
  * GET /api/analytics
  * Fetch aggregated analytics metrics

@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createDataRetentionService } from '@/services/data-retention';
 import { CloudflareWorkersEnv } from '@/config/cloudflare-env';
 
+export const runtime = 'edge';
+
 // This would be replaced with actual auth middleware
 function getUserIdFromRequest(request: NextRequest): string | null {
   // In production, extract from JWT token or session

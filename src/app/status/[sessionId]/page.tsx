@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
+export const runtime = 'edge';
+
 type ProcessingStatus = 'pending' | 'processing' | 'completed' | 'failed';
 
 interface StatusData {
