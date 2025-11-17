@@ -20,7 +20,7 @@ pages_build_output_dir = ".vercel/output/static"
 # ======================
 # [[kv_namespaces]]
 # binding = "RESUME_CACHE"
-# id = "your-kv-namespace-id"
+# id = "c04411d10c7e46c2bfdbb767bc14247d"
 
 # ======================
 # D1 Database Bindings (Optional - set up later)
@@ -28,7 +28,7 @@ pages_build_output_dir = ".vercel/output/static"
 # [[d1_databases]]
 # binding = "DB"
 # database_name = "ai-resume-db"
-# database_id = "your-d1-database-id"
+# database_id = "0407c9de-fd1a-4e94-baf0-0ded8ea90de3"
 
 # ======================
 # Environment Variables
